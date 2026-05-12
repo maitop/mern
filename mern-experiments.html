@@ -1,0 +1,2051 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>MERN Lab Programs — Dev Garg</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg: #0a0a0f;
+  --surface: #111118;
+  --border: #1e1e2e;
+  --accent: #7c6af7;
+  --accent2: #4ade80;
+  --text: #e2e2f0;
+  --muted: #6b6b8a;
+  --highlight: #7c6af720;
+  --tag-bg: #1a1a2e;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Syne', sans-serif;
+  min-height: 100vh;
+}
+
+/* HEADER */
+header {
+  padding: 40px 48px 24px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+.header-title h1 {
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: -1px;
+  background: linear-gradient(135deg, #e2e2f0 0%, var(--accent) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.header-title p {
+  color: var(--muted);
+  font-size: 0.85rem;
+  margin-top: 4px;
+  font-family: 'JetBrains Mono', monospace;
+}
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--tag-bg);
+  border: 1px solid var(--border);
+  padding: 6px 14px;
+  border-radius: 100px;
+  font-size: 0.75rem;
+  color: var(--accent2);
+  font-family: 'JetBrains Mono', monospace;
+}
+.badge::before { content: '●'; font-size: 8px; }
+
+/* SEARCH */
+.search-bar {
+  padding: 20px 48px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.search-wrap {
+  position: relative;
+  flex: 1;
+  min-width: 240px;
+}
+.search-wrap svg {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--muted);
+}
+#searchInput {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 16px 12px 44px;
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.88rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+#searchInput:focus { border-color: var(--accent); }
+#searchInput::placeholder { color: var(--muted); }
+
+.filter-tabs {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.tab {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+  font-family: 'Syne', sans-serif;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.tab:hover { border-color: var(--accent); color: var(--text); }
+.tab.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+/* RESULTS COUNT */
+#resultCount {
+  padding: 10px 48px;
+  font-size: 0.78rem;
+  color: var(--muted);
+  font-family: 'JetBrains Mono', monospace;
+  border-bottom: 1px solid var(--border);
+}
+
+/* MAIN LAYOUT */
+main {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  min-height: calc(100vh - 200px);
+}
+
+/* SIDEBAR */
+aside {
+  border-right: 1px solid var(--border);
+  padding: 24px 0;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+}
+aside::-webkit-scrollbar { width: 4px; }
+aside::-webkit-scrollbar-track { background: transparent; }
+aside::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+.exp-nav-item {
+  padding: 10px 24px;
+  cursor: pointer;
+  transition: all 0.15s;
+  border-left: 2px solid transparent;
+  font-size: 0.82rem;
+}
+.exp-nav-item:hover { background: var(--highlight); color: var(--accent); }
+.exp-nav-item.active { border-left-color: var(--accent); background: var(--highlight); color: var(--accent); }
+.exp-nav-item .exp-num {
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--muted);
+  font-size: 0.72rem;
+  display: block;
+  margin-bottom: 2px;
+}
+.exp-nav-item .exp-name { font-weight: 600; }
+.sidebar-label {
+  padding: 8px 24px;
+  font-size: 0.68rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-family: 'JetBrains Mono', monospace;
+  margin-top: 8px;
+}
+
+/* CONTENT */
+.content {
+  padding: 32px 48px;
+  overflow-y: auto;
+}
+
+/* EXPERIMENT BLOCK */
+.experiment {
+  margin-bottom: 48px;
+  scroll-margin-top: 24px;
+}
+.experiment.hidden { display: none; }
+
+.exp-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+}
+.exp-num-badge {
+  background: var(--accent);
+  color: #fff;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 6px;
+  white-space: nowrap;
+  margin-top: 4px;
+}
+.exp-header h2 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+.exp-header p {
+  font-size: 0.82rem;
+  color: var(--muted);
+  margin-top: 4px;
+  line-height: 1.5;
+}
+
+/* CODE BLOCK */
+.code-section {
+  margin-bottom: 20px;
+}
+.code-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-bottom: none;
+  border-radius: 10px 10px 0 0;
+  padding: 10px 16px;
+}
+.code-filename {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  color: var(--accent2);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.code-filename::before {
+  content: '◆';
+  font-size: 8px;
+  color: var(--accent);
+}
+.copy-btn {
+  background: var(--tag-bg);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  padding: 5px 14px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-family: 'JetBrains Mono', monospace;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.copy-btn:hover { border-color: var(--accent); color: var(--accent); }
+.copy-btn.copied { border-color: var(--accent2); color: var(--accent2); }
+
+pre {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 0 0 10px 10px;
+  padding: 20px;
+  overflow-x: auto;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+  line-height: 1.7;
+  color: #c9d1d9;
+}
+pre::-webkit-scrollbar { height: 4px; }
+pre::-webkit-scrollbar-track { background: transparent; }
+pre::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+/* Syntax highlight */
+.kw { color: #ff79c6; }
+.fn { color: #50fa7b; }
+.str { color: #f1fa8c; }
+.cm { color: #6272a4; font-style: italic; }
+.nb { color: #bd93f9; }
+.op { color: #ff79c6; }
+
+.no-results {
+  text-align: center;
+  padding: 80px 24px;
+  color: var(--muted);
+  font-family: 'JetBrains Mono', monospace;
+}
+.no-results .big { font-size: 3rem; margin-bottom: 12px; }
+
+@media (max-width: 768px) {
+  main { grid-template-columns: 1fr; }
+  aside { display: none; }
+  header, .search-bar, .content, #resultCount { padding-left: 20px; padding-right: 20px; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-title">
+    <h1>MERN Lab Programs</h1>
+    <p>Dev Garg · 07314802723 · All Experiments</p>
+  </div>
+  <span class="badge">8 Experiments</span>
+</header>
+
+<div class="search-bar">
+  <div class="search-wrap">
+    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <input type="text" id="searchInput" placeholder="Search experiments, files, code..." autocomplete="off"/>
+  </div>
+  <div class="filter-tabs">
+    <button class="tab active" data-filter="all">All</button>
+    <button class="tab" data-filter="1">Exp 1</button>
+    <button class="tab" data-filter="2">Exp 2</button>
+    <button class="tab" data-filter="3">Exp 3</button>
+    <button class="tab" data-filter="4">Exp 4</button>
+    <button class="tab" data-filter="5">Exp 5</button>
+    <button class="tab" data-filter="6">Exp 6</button>
+    <button class="tab" data-filter="7">Exp 7</button>
+    <button class="tab" data-filter="8">Exp 8</button>
+  </div>
+</div>
+
+<div id="resultCount">Showing 8 experiments</div>
+
+<main>
+  <aside id="sidebar">
+    <div class="sidebar-label">Experiments</div>
+    <div class="exp-nav-item active" data-target="exp1"><span class="exp-num">Exp 01</span><span class="exp-name">Task Manager</span></div>
+    <div class="exp-nav-item" data-target="exp2"><span class="exp-num">Exp 02</span><span class="exp-name">Blogging Platform</span></div>
+    <div class="exp-nav-item" data-target="exp3"><span class="exp-num">Exp 03</span><span class="exp-name">Social Media</span></div>
+    <div class="exp-nav-item" data-target="exp4"><span class="exp-num">Exp 04</span><span class="exp-name">Weather App</span></div>
+    <div class="exp-nav-item" data-target="exp5"><span class="exp-num">Exp 05</span><span class="exp-name">Bookstore CRUD (React)</span></div>
+    <div class="exp-nav-item" data-target="exp6"><span class="exp-num">Exp 06</span><span class="exp-name">CRUD App (Vanilla JS)</span></div>
+    <div class="exp-nav-item" data-target="exp7"><span class="exp-num">Exp 07</span><span class="exp-name">Inventory Management</span></div>
+    <div class="exp-nav-item" data-target="exp8"><span class="exp-num">Exp 08</span><span class="exp-name">Event Management</span></div>
+  </aside>
+
+  <div class="content" id="content">
+
+    <!-- EXP 1 -->
+    <div class="experiment" id="exp1" data-exp="1" data-tags="task manager jwt auth crud">
+      <div class="exp-header">
+        <span class="exp-num-badge">EXP 01</span>
+        <div>
+          <h2>Task Management Web Application</h2>
+          <p>CRUD task manager with JWT authentication, MongoDB, React frontend</p>
+        </div>
+      </div>
+
+      <div class="code-section">
+        <div class="code-header">
+          <span class="code-filename">server/app.js — Backend Server Configuration</span>
+          <button class="copy-btn" onclick="copyCode(this)">⎘ Copy</button>
+        </div>
+        <pre>import express from "express";
+import cors from "cors";
+import taskRoutes from "./routes/taskRoutes.js";
+import authRoutes from "./routes/authRoutes.js";
+
+const app = express();
+app.use(cors());
+app.use(express.json());
+app.use("/api/tasks", taskRoutes);
+app.use("/api/auth", authRoutes);
+
+export default app;</pre>
+      </div>
+
+      <div class="code-section">
+        <div class="code-header">
+          <span class="code-filename">config/db.js — MongoDB Connection</span>
+          <button class="copy-btn" onclick="copyCode(this)">⎘ Copy</button>
+        </div>
+        <pre>import mongoose from "mongoose";
+
+export const connectDatabase = async () => {
+  await mongoose.connect(process.env.MONGO_URI);
+};</pre>
+      </div>
+
+      <div class="code-section">
+        <div class="code-header">
+          <span class="code-filename">models/User.js — User Schema</span>
+          <button class="copy-btn" onclick="copyCode(this)">⎘ Copy</button>
+        </div>
+        <pre>import mongoose from "mongoose";
+
+const userSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true
+  },
+  email: {
+    type: String,
+    required: true,
+    unique: true
+  },
+  password: {
+    type: String,
+    required: true
+  }
+});
+
+export const User = mongoose.model("User", userSchema);</pre>
+      </div>
+
+      <div class="code-section">
+        <div class="code-header">
+          <span class="code-filename">models/Task.js — Task Schema</span>
+          <button class="copy-btn" onclick="copyCode(this)">⎘ Copy</button>
+        </div>
+        <pre>import mongoose from "mongoose";
+
+const taskSchema = new mongoose.Schema({
+  title: {
+    type: String,
+    required: true
+  },
+  description: {
+    type: String
+  },
+  status: {
+    type: String,
+    enum: ["pending", "completed"],
+    default: "pending"
+  },
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User"
+  }
+});
+
+export const Task = mongoose.model("Task", taskSchema);</pre>
+      </div>
+
+      <div class="code-section">
+        <div class="code-header">
+          <span class="code-filename">controllers/authController.js — Authentication Controller</span>
+          <button class="copy-btn" onclick="copyCode(this)">⎘ Copy</button>
+        </div>
+        <pre>import { User } from "../models/User.js";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+
+export const registerUser = async (req, res) => {
+  const { name, email, password } = req.body;
+  const hashedPassword = await bcrypt.hash(password, 10);
+  const user = await User.create({
+    name,
+    email,
+    password: hashedPassword
+  });
+  res.json(user);
+};
+
+export const loginUser = async (req, res) => {
+  const { email, password } = req.body;
+  const user = await User.findOne({ email });
+  const isMatch = await bcrypt.compare(password, user.password);
+  if (!isMatch) {
+    return res.status(400).json({ message: "Invalid credentials" });
+  }
+  const token = jwt.sign({ id: user._id }, "secretkey");
+  res.json({ token });
+};</pre>
+      </div>
+
+      <div class="code-section">
+        <div class="code-header">
+          <span class="code-filename">controllers/taskController.js — Task Controller</span>
+          <button class="copy-btn" onclick="copyCode(this)">⎘ Copy</button>
+        </div>
+        <pre>import { Task } from "../models/Task.js";
+
+export const getTasks = async (req, res) => {
+  const tasks = await Task.find();
+  res.json(tasks);
+};
+
+export const createTask = async (req, res) => {
+  const { title, description } = req.body;
+  const task = await Task.create({
+    title,
+    description
+  });
+  res.json(task);
+};
+
+export const updateTask = async (req, res) => {
+  const task = await Task.findByIdAndUpdate(
+    req.params.id,
+    req.body,
+    { new: true }
+  );
+  res.json(task);
+};
+
+export const deleteTask = async (req, res) => {
+  await Task.findByIdAndDelete(req.params.id);
+  res.json({ message: "Task deleted" });
+};</pre>
+      </div>
+
+      <div class="code-section">
+        <div class="code-header">
+          <span class="code-filename">client/src/App.jsx — React Frontend</span>
+          <button class="copy-btn" onclick="copyCode(this)">⎘ Copy</button>
+        </div>
+        <pre>import { useEffect, useState } from "react";
+import axios from "axios";
+
+const App = () => {
+  const [tasks, setTasks] = useState([]);
+  const [title, setTitle] = useState("");
+
+  const fetchTasks = async () => {
+    const res = await axios.get("http://localhost:5000/api/tasks");
+    setTasks(res.data);
+  };
+
+  useEffect(() => {
+    fetchTasks();
+  }, []);
+
+  const addTask = async (e) => {
+    e.preventDefault();
+    await axios.post("http://localhost:5000/api/tasks", { title });
+    setTitle("");
+    fetchTasks();
+  };
+
+  const deleteTask = async (id) => {
+    await axios.delete(`http://localhost:5000/api/tasks/${id}`);
+    fetchTasks();
+  };
+
+  return (
+    &lt;div&gt;
+      &lt;h1&gt;Task Manager&lt;/h1&gt;
+      &lt;form onSubmit={addTask}&gt;
+        &lt;input
+          value={title}
+          onChange={(e) =&gt; setTitle(e.target.value)}
+          placeholder="Enter task"
+        /&gt;
+        &lt;button type="submit"&gt;Add&lt;/button&gt;
+      &lt;/form&gt;
+      {tasks.map((task) =&gt; (
+        &lt;div key={task._id}&gt;
+          &lt;p&gt;{task.title}&lt;/p&gt;
+          &lt;button onClick={() =&gt; deleteTask(task._id)}&gt;Delete&lt;/button&gt;
+        &lt;/div&gt;
+      ))}
+    &lt;/div&gt;
+  );
+};
+
+export default App;</pre>
+      </div>
+    </div>
+
+    <!-- EXP 2 -->
+    <div class="experiment" id="exp2" data-exp="2" data-tags="blog blogging platform likes read time mongoose middleware">
+      <div class="exp-header">
+        <span class="exp-num-badge">EXP 02</span>
+        <div>
+          <h2>Blogging Platform</h2>
+          <p>Blog posts with author profiles, tagging, like/clap system, and read time calculation</p>
+        </div>
+      </div>
+
+      <div class="code-section">
+        <div class="code-header">
+          <span class="code-filename">server/index.js — Backend Server Configuration</span>
+          <button class="copy-btn" onclick="copyCode(this)">⎘ Copy</button>
+        </div>
+        <pre>const express = require('express');
+const mongoose = require('mongoose');
+const cors = require('cors');
+const blogRoutes = require('./routes/blogRoutes');
+
+const app = express();
+app.use(cors());
+app.use(express.json());
+app.use('/api/blogs', blogRoutes);
+
+mongoose.connect(process.env.MONGODB_URL)
+  .then(() => console.log('Connected to MongoDB'));
+
+app.listen(5000, () => console.log('Server running on port 5000'));</pre>
+      </div>
+
+      <div class="code-section">
+        <div class="code-header">
+          <span class="code-filename">models/Blog.js — MongoDB Schema for Blog Posts</span>
+          <button class="copy-btn" onclick="copyCode(this)">⎘ Copy</button>
+        </div>
+        <pre>const mongoose = require('mongoose');
+
+const blogSchema = new mongoose.Schema({
+  title: { type: String, required: true },
+  content: { type: String, required: true },
+  author: { type: String, required: true },
+  tags: [{ type: String }],
+  likes: { type: Number, default: 0 },
+  createdAt: { type: Date, default: Date.now }
+});
+
+blogSchema.pre('save', function(next) {
+  this.readTime = Math.ceil(this.content.split(' ').length / 200);
+  this.excerpt = this.content.substring(0, 150) + '...';
+  next();
+});
+
+module.exports = mongoose.model('Blog', blogSchema);</pre>
+      </div>
+
+      <div class="code-section">
+        <div class="code-header">
+          <span class="code-filename">controllers/blogController.js — Blog CRUD Operations</span>
+          <button class="copy-btn" onclick="copyCode(this)">⎘ Copy</button>
+        </div>
+        <pre>const Blog = require('../models/Blog');
+
+router.get('/', async (req, res) => {
+  const blogs = await Blog.find().sort({ createdAt: -1 });
+  res.json(blogs);
+});
+
+router.get('/:id', async (req, res) => {
+  const blog = await Blog.findById(req.params.id);
+  res.json(blog);
+});
+
+router.post('/', async (req, res) => {
+  const blog = new Blog(req.body);
+  const savedBlog = await blog.save();
+  res.status(201).json(savedBlog);
+});
+
+router.patch('/:id/like', async (req, res) => {
+  const { action } = req.body;
+  const increment = action === 'unlike' ? -1 : 1;
+  const blog = await Blog.findByIdAndUpdate(
+    req.params.id,
+    { $inc: { likes: increment } },
+    { new: true }
+  );
+  res.json(blog);
+});</pre>
+      </div>
+
+      <div class="code-section">
+        <div class="code-header">
+          <span class="code-filename">client/src/components/BlogDetail.jsx — Like System</span>
+          <button class="copy-btn" onclick="copyCode(this)">⎘ Copy</button>
+        </div>
+        <pre>const handleLike = async () => {
+  const action = liked ? 'unlike' : 'like';
+  const response = await axios.patch(
+    `http://localhost:5000/api/blogs/${id}/like`,
+    { action }
+  );
+  setBlog(response.data);
+  setLiked(!liked);
+};</pre>
+      </div>
+
+      <div class="code-section">
+        <div class="code-header">
+          <span class="code-filename">client/src/App.jsx — React Router Setup</span>
+          <button class="copy-btn" onclick="copyCode(this)">⎘ Copy</button>
+        </div>
+        <pre>import { Routes, Route } from 'react-router-dom';
+import BlogList from './components/BlogList';
+import BlogDetail from './components/BlogDetail';
+import CreateBlog from './components/CreateBlog';
+
+function App() {
+  return (
+    &lt;div className="app"&gt;
+      &lt;Navbar /&gt;
+      &lt;Routes&gt;
+        &lt;Route path="/" element={&lt;BlogList /&gt;} /&gt;
+        &lt;Route path="/blog/:id" element={&lt;BlogDetail /&gt;} /&gt;
+        &lt;Route path="/create" element={&lt;CreateBlog /&gt;} /&gt;
+      &lt;/Routes&gt;
+    &lt;/div&gt;
+  );
+}</pre>
+      </div>
+
+      <div class="code-section">
+        <div class="code-header">
+          <span class="code-filename">client/src/services/api.js — Frontend API Calls</span>
+          <button class="copy-btn" onclick="copyCode(this)">⎘ Copy</button>
+        </div>
+        <pre>const API_BASE_URL = 'http://localhost:5000/api';
+
+export const fetchBlogs = async () => {
+  const response = await axios.get(`${API_BASE_URL}/blogs`);
+  return response.data;
+};
+
+export const createBlog = async (blogData) => {
+  const response = await axios.post(`${API_BASE_URL}/blogs`, blogData);
+  return response.data;
+};
+
+export const likeBlog = async (id, action) => {
+  const response = await axios.patch(`${API_BASE_URL}/blogs/${id}/like`, { action });
+  return response.data;
+};</pre>
+      </div>
+
+      <div class="code-section">
+        <div class="code-header">
+          <span class="code-filename">.env — Environment File</span>
+          <button class="copy-btn" onclick="copyCode(this)">⎘ Copy</button>
+        </div>
+        <pre>MONGODB_URL=mongodb+srv://your_connection_string
+PORT=5000</pre>
+      </div>
+    </div>
+
+    <!-- EXP 3 -->
+    <div class="experiment" id="exp3" data-exp="3" data-tags="social media posts jwt auth register login feed">
+      <div class="exp-header">
+        <span class="exp-num-badge">EXP 03</span>
+        <div>
+          <h2>Social Media Platform</h2>
+          <p>User accounts, post creation/deletion, JWT authentication, live feed</p>
+        </div>
+      </div>
+
+      <div class="code-section">
+        <div class="code-header">
+          <span class="code-filename">server/app.js — Backend Server Configuration</span>
+          <button class="copy-btn" onclick="copyCode(this)">⎘ Copy</button>
+        </div>
+        <pre>import express from "express";
+import cors from "cors";
+import authRoutes from "./routes/authRoutes.js";
+import postRoutes from "./routes/postRoutes.js";
+
+const app = express();
+app.use(cors());
+app.use(express.json());
+app.use("/api/auth", authRoutes);
+app.use("/api/posts", postRoutes);
+
+export default app;</pre>
+      </div>
+
+      <div class="code-section">
+        <div class="code-header">
+          <span class="code-filename">models/User.js — User Schema</span>
+          <button class="copy-btn" onclick="copyCode(this)">⎘ Copy</button>
+        </div>
+        <pre>import mongoose from "mongoose";
+
+const userSchema = new mongoose.Schema({
+  username: String,
+  email: String,
+  password: String
+});
+
+export const User = mongoose.model("User", userSchema);</pre>
+      </div>
+
+      <div class="code-section">
+        <div class="code-header">
+          <span class="code-filename">models/Post.js — Post Schema</span>
+          <button class="copy-btn" onclick="copyCode(this)">⎘ Copy</button>
+        </div>
+        <pre>import mongoose from "mongoose";
+
+const postSchema = new mongoose.Schema({
+  userId: mongoose.Schema.Types.ObjectId,
+  content: String,
+  createdAt: {
+    type: Date,
+    default: Date.now
+  }
+});
+
+export const Post = mongoose.model("Post", postSchema);</pre>
+      </div>
+
+      <div class="code-section">
+        <div class="code-header">
+          <span class="code-filename">controllers/authController.js — Authentication Controller</span>
+          <button class="copy-btn" onclick="copyCode(this)">⎘ Copy</button>
+        </div>
+        <pre>import jwt from "jsonwebtoken";
+import { User } from "../models/User.js";
+
+export const register = async (req, res) => {
+  const user = await User.create(req.body);
+  res.json(user);
+};
+
+export const login = async (req, res) => {
+  const user = await User.findOne({ email: req.body.email });
+  const token = jwt.sign({ id: user._id }, "secret");
+  res.json({ token });
+};</pre>
+      </div>
+
+      <div class="code-section">
+        <div class="code-header">
+          <span class="code-filename">controllers/postController.js — Post Controller</span>
+          <button class="copy-btn" onclick="copyCode(this)">⎘ Copy</button>
+        </div>
+        <pre>import { Post } from "../models/Post.js";
+
+export const createPost = async (req, res) => {
+  const post = await Post.create(req.body);
+  res.json(post);
+};
+
+export const getPosts = async (_req, res) => {
+  const posts = await Post.find().sort({ createdAt: -1 });
+  res.json(posts);
+};</pre>
+      </div>
+
+      <div class="code-section">
+        <div class="code-header">
+          <span class="code-filename">client/src/App.jsx — React Frontend</span>
+          <button class="copy-btn" onclick="copyCode(this)">⎘ Copy</button>
+        </div>
+        <pre>import { useState, useEffect } from "react";
+import { fetchPosts, createPost } from "./api";
+
+const App = () => {
+  const [posts, setPosts] = useState([]);
+  const [content, setContent] = useState("");
+
+  useEffect(() => {
+    loadPosts();
+  }, []);
+
+  const loadPosts = async () => {
+    const data = await fetchPosts();
+    setPosts(data);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    await createPost({ content });
+    setContent("");
+    loadPosts();
+  };
+
+  return (
+    &lt;div&gt;
+      &lt;h1&gt;Social Media Platform&lt;/h1&gt;
+    &lt;/div&gt;
+  );
+};
+
+export default App;</pre>
+      </div>
+
+      <div class="code-section">
+        <div class="code-header">
+          <span class="code-filename">client/src/api.js — API Calls</span>
+          <button class="copy-btn" onclick="copyCode(this)">⎘ Copy</button>
+        </div>
+        <pre>const API_BASE_URL = "http://localhost:5000/api";
+
+export const fetchPosts = async () => {
+  const res = await fetch(`${API_BASE_URL}/posts`);
+  return res.json();
+};
+
+export const createPost = async (post) => {
+  const res = await fetch(`${API_BASE_URL}/posts`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(post)
+  });
+  return res.json();
+};</pre>
+      </div>
+
+      <div class="code-section">
+        <div class="code-header">
+          <span class="code-filename">.env — Environment File</span>
+          <button class="copy-btn" onclick="copyCode(this)">⎘ Copy</button>
+        </div>
+        <pre>PORT=5000
+MONGODB_URI=your_mongodb_connection_string
+JWT_SECRET=your_secret_key</pre>
+      </div>
+    </div>
+
+    <!-- EXP 4 -->
+    <div class="experiment" id="exp4" data-exp="4" data-tags="weather openweathermap forecast search history api">
+      <div class="exp-header">
+        <span class="exp-num-badge">EXP 04</span>
+        <div>
+          <h2>Weather Forecasting App</h2>
+          <p>Real-time weather via OpenWeatherMap API, search history stored in MongoDB</p>
+        </div>
+      </div>
+
+      <div class="code-section">
+        <div class="code-header">
+          <span class="code-filename">server/app.js — Backend Server Configuration</span>
+          <button class="copy-btn" onclick="copyCode(this)">⎘ Copy</button>
+        </div>
+        <pre>import cors from "cors";
+import express from "express";
+import historyRoutes from "./routes/historyRoutes.js";
+import weatherRoutes from "./routes/weatherRoutes.js";
+
+const app = express();
+app.use(cors());
+app.use(express.json());
+app.use("/api/weather", weatherRoutes);
+app.use("/api/history", historyRoutes);
+
+export default app;</pre>
+      </div>
+
+      <div class="code-section">
+        <div class="code-header">
+          <span class="code-filename">models/SearchHistory.js — MongoDB Schema for Search History</span>
+          <button class="copy-btn" onclick="copyCode(this)">⎘ Copy</button>
+        </div>
+        <pre>import mongoose from "mongoose";
+
+const searchHistorySchema = new mongoose.Schema({
+  city: { type: String, required: true },
+  country: { type: String, required: true },
+  temperature: { type: Number, required: true },
+  condition: { type: String, required: true },
+  searchedAt: { type: Date, default: Date.now }
+});
+
+export const SearchHistory = mongoose.model("SearchHistory", searchHistorySchema);</pre>
+      </div>
+
+      <div class="code-section">
+        <div class="code-header">
+          <span class="code-filename">services/weatherService.js — Weather API Integration</span>
+          <button class="copy-btn" onclick="copyCode(this)">⎘ Copy</button>
+        </div>
+        <pre>const BASE_URL = "https://api.openweathermap.org/data/2.5";
+
+export const fetchWeatherByCity = async (city) => {
+  const currentResponse = await fetch(
+    `${BASE_URL}/weather?q=${city}&appid=${process.env.OPENWEATHER_API_KEY}&units=metric`
+  );
+  const forecastResponse = await fetch(
+    `${BASE_URL}/forecast?q=${city}&appid=${process.env.OPENWEATHER_API_KEY}&units=metric`
+  );
+
+  const currentData = await currentResponse.json();
+  const forecastData = await forecastResponse.json();
+
+  return {
+    location: {
+      city: currentData.name,
+      country: currentData.sys.country
+    },
+    current: {
+      temperature: Math.round(currentData.main.temp),
+      feelsLike: Math.round(currentData.main.feels_like),
+      humidity: currentData.main.humidity,
+      windSpeed: currentData.wind.speed,
+      condition: currentData.weather[0].main
+    },
+    forecast: forecastData.list.slice(0, 5).map((item) => ({
+      date: item.dt_txt,
+      temperature: Math.round(item.main.temp),
+      condition: item.weather[0].main
+    }))
+  };
+};</pre>
+      </div>
+
+      <div class="code-section">
+        <div class="code-header">
+          <span class="code-filename">controllers/weatherController.js — Weather Controller</span>
+          <button class="copy-btn" onclick="copyCode(this)">⎘ Copy</button>
+        </div>
+        <pre>import { SearchHistory } from "../models/SearchHistory.js";
+import { fetchWeatherByCity } from "../services/weatherService.js";
+
+export const getWeatherByCity = async (req, res) => {
+  const city = req.params.city.trim();
+  if (!city) {
+    return res.status(400).json({ message: "City name is required." });
+  }
+  const weatherData = await fetchWeatherByCity(city);
+  await SearchHistory.create({
+    city: weatherData.location.city,
+    country: weatherData.location.country,
+    temperature: weatherData.current.temperature,
+    condition: weatherData.current.condition
+  });
+  res.json(weatherData);
+};</pre>
+      </div>
+
+      <div class="code-section">
+        <div class="code-header">
+          <span class="code-filename">controllers/historyController.js — Search History Retrieval</span>
+          <button class="copy-btn" onclick="copyCode(this)">⎘ Copy</button>
+        </div>
+        <pre>import { SearchHistory } from "../models/SearchHistory.js";
+
+export const getSearchHistory = async (_req, res) => {
+  const history = await SearchHistory.find()
+    .sort({ searchedAt: -1 })
+    .limit(8);
+  res.json(history);
+};</pre>
+      </div>
+
+      <div class="code-section">
+        <div class="code-header">
+          <span class="code-filename">client/src/App.jsx — React Frontend</span>
+          <button class="copy-btn" onclick="copyCode(this)">⎘ Copy</button>
+        </div>
+        <pre>import { useEffect, useState } from "react";
+import { fetchHistory, fetchWeather } from "./services/api";
+
+const App = () => {
+  const [city, setCity] = useState("");
+  const [weatherData, setWeatherData] = useState(null);
+  const [history, setHistory] = useState([]);
+  const [error, setError] = useState("");
+
+  const loadHistory = async () => {
+    const data = await fetchHistory();
+    setHistory(data);
+  };
+
+  useEffect(() => {
+    loadHistory();
+  }, []);
+
+  const handleSearch = async (event) => {
+    event.preventDefault();
+    try {
+      setError("");
+      const data = await fetchWeather(city);
+      setWeatherData(data);
+      loadHistory();
+    } catch (searchError) {
+      setWeatherData(null);
+      setError(searchError.message);
+    }
+  };
+
+  return (
+    &lt;div&gt;
+      &lt;h1&gt;Weather Forecasting App&lt;/h1&gt;
+    &lt;/div&gt;
+  );
+};
+
+export default App;</pre>
+      </div>
+
+      <div class="code-section">
+        <div class="code-header">
+          <span class="code-filename">client/src/services/api.js — Frontend API Calls</span>
+          <button class="copy-btn" onclick="copyCode(this)">⎘ Copy</button>
+        </div>
+        <pre>const API_BASE_URL = "http://localhost:5000/api";
+
+export const fetchWeather = async (city) => {
+  const response = await fetch(`${API_BASE_URL}/weather/${encodeURIComponent(city)}`);
+  return response.json();
+};
+
+export const fetchHistory = async () => {
+  const response = await fetch(`${API_BASE_URL}/history`);
+  return response.json();
+};</pre>
+      </div>
+
+      <div class="code-section">
+        <div class="code-header">
+          <span class="code-filename">.env — Environment File</span>
+          <button class="copy-btn" onclick="copyCode(this)">⎘ Copy</button>
+        </div>
+        <pre>PORT=5000
+MONGODB_URI=your_mongodb_connection_string
+OPENWEATHER_API_KEY=your_openweather_api_key
+CLIENT_URL=http://localhost:5173</pre>
+      </div>
+    </div>
+
+    <!-- EXP 5 -->
+    <div class="experiment" id="exp5" data-exp="5" data-tags="bookstore crud react axios books inventory stock">
+      <div class="exp-header">
+        <span class="exp-num-badge">EXP 05</span>
+        <div>
+          <h2>Bookstore Library &amp; Stock Management (React)</h2>
+          <p>Full CRUD for book inventory with React frontend and Axios</p>
+        </div>
+      </div>
+
+      <div class="code-section">
+        <div class="code-header">
+          <span class="code-filename">server/server.js — Backend Server and CRUD API Routes</span>
+          <button class="copy-btn" onclick="copyCode(this)">⎘ Copy</button>
+        </div>
+        <pre>const express = require("express");
+const mongoose = require("mongoose");
+const cors = require("cors");
+const app = express();
+
+app.use(cors());
+app.use(express.json());
+
+mongoose.connect("mongodb://127.0.0.1:27017/bookstore");
+
+const Book = require("./models/Book");
+
+app.get("/api/books", async (req, res) => {
+  const books = await Book.find().sort({ createdAt: -1 });
+  res.json(books);
+});
+
+app.post("/api/books", async (req, res) => {
+  const book = new Book(req.body);
+  await book.save();
+  res.json(book);
+});
+
+app.put("/api/books/:id", async (req, res) => {
+  const updatedBook = await Book.findByIdAndUpdate(
+    req.params.id,
+    req.body,
+    { new: true }
+  );
+  res.json(updatedBook);
+});
+
+app.delete("/api/books/:id", async (req, res) => {
+  await Book.findByIdAndDelete(req.params.id);
+  res.json({ message: "Book deleted" });
+});
+
+app.listen(5000, () => console.log("Server running on port 5000"));</pre>
+      </div>
+
+      <div class="code-section">
+        <div class="code-header">
+          <span class="code-filename">models/Book.js — MongoDB Schema and Model</span>
+          <button class="copy-btn" onclick="copyCode(this)">⎘ Copy</button>
+        </div>
+        <pre>const mongoose = require("mongoose");
+
+const bookSchema = new mongoose.Schema(
+  {
+    title: { type: String, required: true },
+    author: { type: String, required: true },
+    category: { type: String, required: true },
+    price: { type: Number, required: true },
+    stock: { type: Number, required: true },
+  },
+  { timestamps: true }
+);
+
+module.exports = mongoose.model("Book", bookSchema);</pre>
+      </div>
+
+      <div class="code-section">
+        <div class="code-header">
+          <span class="code-filename">client/src/App.jsx — React Frontend (Full UI + Form + Table)</span>
+          <button class="copy-btn" onclick="copyCode(this)">⎘ Copy</button>
+        </div>
+        <pre>import React, { useEffect, useState } from "react";
+import axios from "axios";
+import "./App.css";
+
+function App() {
+  const [books, setBooks] = useState([]);
+  const [form, setForm] = useState({ title: "", author: "", category: "", price: "", stock: "" });
+  const [editId, setEditId] = useState(null);
+
+  const fetchBooks = async () => {
+    const res = await axios.get("http://localhost:5000/api/books");
+    setBooks(res.data);
+  };
+
+  useEffect(() => { fetchBooks(); }, []);
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (editId) {
+      await axios.put(`http://localhost:5000/api/books/${editId}`, form);
+      setEditId(null);
+    } else {
+      await axios.post("http://localhost:5000/api/books", form);
+    }
+    setForm({ title: "", author: "", category: "", price: "", stock: "" });
+    fetchBooks();
+  };
+
+  const handleEdit = (book) => {
+    setForm(book);
+    setEditId(book._id);
+  };
+
+  const handleDelete = async (id) => {
+    await axios.delete(`http://localhost:5000/api/books/${id}`);
+    fetchBooks();
+  };
+
+  return (
+    &lt;div className="container"&gt;
+      &lt;h1&gt;Bookstore App&lt;/h1&gt;
+      &lt;form onSubmit={handleSubmit}&gt;
+        &lt;input name="title" placeholder="Title" value={form.title} onChange={handleChange} required /&gt;
+        &lt;input name="author" placeholder="Author" value={form.author} onChange={handleChange} required /&gt;
+        &lt;input name="category" placeholder="Category" value={form.category} onChange={handleChange} required /&gt;
+        &lt;input name="price" placeholder="Price" value={form.price} onChange={handleChange} required /&gt;
+        &lt;input name="stock" placeholder="Stock" value={form.stock} onChange={handleChange} required /&gt;
+        &lt;button type="submit"&gt;{editId ? "Update" : "Add Book"}&lt;/button&gt;
+      &lt;/form&gt;
+      &lt;table&gt;
+        &lt;thead&gt;
+          &lt;tr&gt;
+            &lt;th&gt;Title&lt;/th&gt;&lt;th&gt;Author&lt;/th&gt;&lt;th&gt;Category&lt;/th&gt;
+            &lt;th&gt;Price&lt;/th&gt;&lt;th&gt;Stock&lt;/th&gt;&lt;th&gt;Actions&lt;/th&gt;
+          &lt;/tr&gt;
+        &lt;/thead&gt;
+        &lt;tbody&gt;
+          {books.map((b) =&gt; (
+            &lt;tr key={b._id}&gt;
+              &lt;td&gt;{b.title}&lt;/td&gt;&lt;td&gt;{b.author}&lt;/td&gt;&lt;td&gt;{b.category}&lt;/td&gt;
+              &lt;td&gt;₹{b.price}&lt;/td&gt;&lt;td&gt;{b.stock}&lt;/td&gt;
+              &lt;td&gt;
+                &lt;button onClick={() =&gt; handleEdit(b)}&gt;Edit&lt;/button&gt;
+                &lt;button onClick={() =&gt; handleDelete(b._id)}&gt;Delete&lt;/button&gt;
+              &lt;/td&gt;
+            &lt;/tr&gt;
+          ))}
+        &lt;/tbody&gt;
+      &lt;/table&gt;
+    &lt;/div&gt;
+  );
+}
+
+export default App;</pre>
+      </div>
+
+      <div class="code-section">
+        <div class="code-header">
+          <span class="code-filename">client/src/App.css — UI Styling</span>
+          <button class="copy-btn" onclick="copyCode(this)">⎘ Copy</button>
+        </div>
+        <pre>body {
+  font-family: Arial;
+  background: #f3f4f6;
+  padding: 20px;
+}
+.container { max-width: 900px; margin: auto; }
+form input { margin: 5px; padding: 8px; }
+button { padding: 8px; margin: 5px; cursor: pointer; }
+table { width: 100%; margin-top: 20px; border-collapse: collapse; }
+th, td { border: 1px solid #ccc; padding: 10px; }</pre>
+      </div>
+    </div>
+
+    <!-- EXP 6 -->
+    <div class="experiment" id="exp6" data-exp="6" data-tags="crud vanilla javascript html form items name email age">
+      <div class="exp-header">
+        <span class="exp-num-badge">EXP 06</span>
+        <div>
+          <h2>CRUD Application (Vanilla JS + Express)</h2>
+          <p>Pure HTML/CSS/JS frontend with Node.js backend, name/email/age records</p>
+        </div>
+      </div>
+
+      <div class="code-section">
+        <div class="code-header">
+          <span class="code-filename">server/server.js — Backend Server and CRUD API Routes</span>
+          <button class="copy-btn" onclick="copyCode(this)">⎘ Copy</button>
+        </div>
+        <pre>const express = require("express");
+const mongoose = require("mongoose");
+const path = require("path");
+require("dotenv").config();
+
+const Item = require("./models/Item");
+const app = express();
+const port = process.env.PORT || 3000;
+const mongoUri = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/crud_app";
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, "public")));
+
+app.get("/api/items", async (req, res) => {
+  try {
+    const items = await Item.find().sort({ createdAt: -1 });
+    res.json(items);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch items" });
+  }
+});
+
+app.post("/api/items", async (req, res) => {
+  try {
+    const { name, email, age } = req.body;
+    const item = await Item.create({ name, email, age: Number(age) });
+    res.status(201).json(item);
+  } catch (error) {
+    res.status(400).json({ message: "Failed to create item" });
+  }
+});
+
+app.put("/api/items/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, email, age } = req.body;
+    const item = await Item.findByIdAndUpdate(
+      id,
+      { name, email, age: Number(age) },
+      { new: true, runValidators: true }
+    );
+    if (!item) return res.status(404).json({ message: "Item not found" });
+    res.json(item);
+  } catch (error) {
+    res.status(400).json({ message: "Failed to update item" });
+  }
+});
+
+app.delete("/api/items/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const item = await Item.findByIdAndDelete(id);
+    if (!item) return res.status(404).json({ message: "Item not found" });
+    res.json({ message: "Item deleted" });
+  } catch (error) {
+    res.status(400).json({ message: "Failed to delete item" });
+  }
+});
+
+async function startServer() {
+  try {
+    await mongoose.connect(mongoUri, { serverSelectionTimeoutMS: 5000 });
+    app.listen(port, () => {
+      console.log(`Server running on http://localhost:${port}`);
+    });
+  } catch (error) {
+    console.error("Database connection failed");
+    process.exit(1);
+  }
+}
+startServer();</pre>
+      </div>
+
+      <div class="code-section">
+        <div class="code-header">
+          <span class="code-filename">models/Item.js — MongoDB Schema and Model</span>
+          <button class="copy-btn" onclick="copyCode(this)">⎘ Copy</button>
+        </div>
+        <pre>const mongoose = require("mongoose");
+
+const itemSchema = new mongoose.Schema(
+  {
+    name: { type: String, required: true, trim: true },
+    email: { type: String, required: true, trim: true, lowercase: true },
+    age: { type: Number, required: true, min: 0 },
+  },
+  { timestamps: true }
+);
+
+module.exports = mongoose.model("Item", itemSchema);</pre>
+      </div>
+
+      <div class="code-section">
+        <div class="code-header">
+          <span class="code-filename">public/index.html — Frontend HTML Form</span>
+          <button class="copy-btn" onclick="copyCode(this)">⎘ Copy</button>
+        </div>
+        <pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+  &lt;meta charset="UTF-8" /&gt;
+  &lt;meta name="viewport" content="width=device-width, initial-scale=1.0" /&gt;
+  &lt;title&gt;CRUD App&lt;/title&gt;
+  &lt;link rel="stylesheet" href="style.css" /&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;main class="container"&gt;
+    &lt;h1&gt;CRUD Application&lt;/h1&gt;
+    &lt;form id="itemForm" class="card"&gt;
+      &lt;h2 id="formTitle"&gt;Create Item&lt;/h2&gt;
+      &lt;div class="field"&gt;
+        &lt;label for="name"&gt;Name&lt;/label&gt;
+        &lt;input id="name" name="name" type="text" required /&gt;
+      &lt;/div&gt;
+      &lt;div class="field"&gt;
+        &lt;label for="email"&gt;Email&lt;/label&gt;
+        &lt;input id="email" name="email" type="email" required /&gt;
+      &lt;/div&gt;
+      &lt;div class="field"&gt;
+        &lt;label for="age"&gt;Age&lt;/label&gt;
+        &lt;input id="age" name="age" type="number" min="0" required /&gt;
+      &lt;/div&gt;
+      &lt;div class="actions"&gt;
+        &lt;button type="submit" id="submitBtn"&gt;Create&lt;/button&gt;
+        &lt;button type="button" id="cancelBtn" class="hidden"&gt;Cancel&lt;/button&gt;
+      &lt;/div&gt;
+    &lt;/form&gt;
+    &lt;section class="card"&gt;
+      &lt;h2&gt;Saved Items&lt;/h2&gt;
+      &lt;table&gt;
+        &lt;thead&gt;
+          &lt;tr&gt;&lt;th&gt;Name&lt;/th&gt;&lt;th&gt;Email&lt;/th&gt;&lt;th&gt;Age&lt;/th&gt;&lt;th&gt;Actions&lt;/th&gt;&lt;/tr&gt;
+        &lt;/thead&gt;
+        &lt;tbody id="itemTableBody"&gt;&lt;/tbody&gt;
+      &lt;/table&gt;
+    &lt;/section&gt;
+  &lt;/main&gt;
+  &lt;script src="app.js"&gt;&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+      </div>
+
+      <div class="code-section">
+        <div class="code-header">
+          <span class="code-filename">public/app.js — Client-Side CRUD Logic</span>
+          <button class="copy-btn" onclick="copyCode(this)">⎘ Copy</button>
+        </div>
+        <pre>const form = document.getElementById("itemForm");
+const tableBody = document.getElementById("itemTableBody");
+const formTitle = document.getElementById("formTitle");
+const submitBtn = document.getElementById("submitBtn");
+const cancelBtn = document.getElementById("cancelBtn");
+const nameInput = document.getElementById("name");
+const emailInput = document.getElementById("email");
+const ageInput = document.getElementById("age");
+let editId = null;
+
+async function fetchItems() {
+  const res = await fetch("/api/items");
+  const items = await res.json();
+  tableBody.innerHTML = "";
+  for (const item of items) {
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      &lt;td&gt;${item.name}&lt;/td&gt;
+      &lt;td&gt;${item.email}&lt;/td&gt;
+      &lt;td&gt;${item.age}&lt;/td&gt;
+      &lt;td&gt;
+        &lt;div class="row-actions"&gt;
+          &lt;button type="button" data-action="edit" data-id="${item._id}"&gt;Edit&lt;/button&gt;
+          &lt;button type="button" data-action="delete" data-id="${item._id}"&gt;Delete&lt;/button&gt;
+        &lt;/div&gt;
+      &lt;/td&gt;
+    `;
+    tableBody.appendChild(row);
+  }
+}
+
+function resetForm() {
+  editId = null;
+  form.reset();
+  formTitle.textContent = "Create Item";
+  submitBtn.textContent = "Create";
+  cancelBtn.classList.add("hidden");
+}
+
+form.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const payload = {
+    name: nameInput.value.trim(),
+    email: emailInput.value.trim(),
+    age: Number(ageInput.value),
+  };
+  const url = editId ? `/api/items/${editId}` : "/api/items";
+  const method = editId ? "PUT" : "POST";
+  const res = await fetch(url, {
+    method,
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) { alert("Request failed"); return; }
+  resetForm();
+  await fetchItems();
+});
+
+cancelBtn.addEventListener("click", () => { resetForm(); });
+
+tableBody.addEventListener("click", async (event) => {
+  const target = event.target;
+  if (!(target instanceof HTMLButtonElement)) return;
+  const action = target.dataset.action;
+  const id = target.dataset.id;
+  if (!id) return;
+
+  if (action === "delete") {
+    const confirmed = confirm("Delete this item?");
+    if (!confirmed) return;
+    const res = await fetch(`/api/items/${id}`, { method: "DELETE" });
+    if (!res.ok) { alert("Delete failed"); return; }
+    await fetchItems();
+  }
+
+  if (action === "edit") {
+    const row = target.closest("tr");
+    if (!row) return;
+    nameInput.value = row.children[0].textContent;
+    emailInput.value = row.children[1].textContent;
+    ageInput.value = row.children[2].textContent;
+    editId = id;
+    formTitle.textContent = "Update Item";
+    submitBtn.textContent = "Update";
+    cancelBtn.classList.remove("hidden");
+  }
+});
+
+fetchItems();</pre>
+      </div>
+
+      <div class="code-section">
+        <div class="code-header">
+          <span class="code-filename">public/style.css — UI Styling &amp; Responsive Design</span>
+          <button class="copy-btn" onclick="copyCode(this)">⎘ Copy</button>
+        </div>
+        <pre>:root {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  color: #1f2937;
+  background: #f3f4f6;
+}
+* { box-sizing: border-box; }
+body { margin: 0; padding: 24px; }
+.container { max-width: 900px; margin: 0 auto; display: grid; gap: 20px; }
+h1, h2 { margin: 0 0 12px; }
+.card { background: #fff; border-radius: 12px; padding: 16px; box-shadow: 0 8px 24px rgba(0,0,0,.08); }
+.field { display: grid; gap: 8px; margin-bottom: 12px; }
+input, button { padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; }
+.actions { display: flex; gap: 10px; }
+button { cursor: pointer; background: #111827; color: #fff; border: none; }
+button:hover { opacity: 0.9; }
+.hidden { display: none; }
+table { width: 100%; border-collapse: collapse; }
+th, td { text-align: left; padding: 10px; border-bottom: 1px solid #e5e7eb; }
+.row-actions { display: flex; gap: 8px; }
+.row-actions button { padding: 6px 10px; font-size: 12px; }
+
+@media (max-width: 700px) {
+  body { padding: 12px; }
+  table, thead, tbody, th, td, tr { display: block; }
+  thead { display: none; }
+  tr { margin-bottom: 12px; border: 1px solid #e5e7eb; border-radius: 8px; padding: 8px; }
+  td { border: none; padding: 6px 0; }
+}</pre>
+      </div>
+    </div>
+
+    <!-- EXP 7 -->
+    <div class="experiment" id="exp7" data-exp="7" data-tags="inventory management redux toolkit store roles admin staff manager">
+      <div class="exp-header">
+        <span class="exp-num-badge">EXP 07</span>
+        <div>
+          <h2>Inventory Management System</h2>
+          <p>Multi-role platform with Redux Toolkit — Admin, Manager, Staff dashboards</p>
+        </div>
+      </div>
+
+      <div class="code-section">
+        <div class="code-header">
+          <span class="code-filename">client/src/app/store.js — Redux Store Configuration</span>
+          <button class="copy-btn" onclick="copyCode(this)">⎘ Copy</button>
+        </div>
+        <pre>import { configureStore } from "@reduxjs/toolkit";
+import authReducer from "../features/authSlice";
+import productReducer from "../features/productSlice";
+import categoryReducer from "../features/categorySlice";
+import supplierReducer from "../features/SupplierSlice";
+import activityReducer from '../features/activitySlice';
+import orderReducer from "../features/orderSlice";
+import notificationReducer from "../features/notificationSlice";
+import stocktransactionReducer from '../features/stocktransactionSlice';
+import salesReducer from "../features/salesSlice";
+
+const store = configureStore({
+  reducer: {
+    auth: authReducer,
+    product: productReducer,
+    category: categoryReducer,
+    supplier: supplierReducer,
+    activity: activityReducer,
+    order: orderReducer,
+    notification: notificationReducer,
+    stocktransaction: stocktransactionReducer,
+    sales: salesReducer
+  }
+});
+
+export default store;</pre>
+      </div>
+
+      <div class="code-section">
+        <div class="code-header">
+          <span class="code-filename">client/src/App.jsx — Multi-Role App Router</span>
+          <button class="copy-btn" onclick="copyCode(this)">⎘ Copy</button>
+        </div>
+        <pre>import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import HomePage from "./pages/HomePage";
+import SignupPage from "./pages/SignupPages";
+import LoginPage from "./pages/LoginPage";
+import ManagerDashboard from "./pages/ManagerDashboard";
+import AdminDashboard from "./pages/AdminDashboard";
+import StaffDashboard from "./pages/StaffDashboard";
+import Productpage from "./pages/Productpage";
+import Orderpage from "./pages/Orderpage";
+import Salespage from "./pages/Salespage";
+import StockTransaction from "./pages/StockTransaction";
+import Categorypage from "./pages/Categorypage";
+import Notificationpage from "./pages/Notificationpage";
+import Supplierpage from "./pages/Supplierpage";
+import Activitylogpage from "./pages/Activitylogpage";
+import Dashboardpage from "./pages/Dashboardpage";
+import ProtectedRoute from "./lib/ProtectedRoute";
+import { Toaster } from "react-hot-toast";
+
+function App() {
+  return (
+    &lt;Router&gt;
+      &lt;div&gt;
+        &lt;Toaster /&gt;
+        &lt;Routes&gt;
+          &lt;Route path="/" element={&lt;HomePage /&gt;} /&gt;
+          &lt;Route path="/SignupPage" element={&lt;SignupPage /&gt;} /&gt;
+          &lt;Route path="/LoginPage" element={&lt;LoginPage /&gt;} /&gt;
+
+          &lt;Route path="/ManagerDashboard" element={&lt;ProtectedRoute element={&lt;ManagerDashboard /&gt;} /&gt;}&gt;
+            &lt;Route index element={&lt;ProtectedRoute element={&lt;Dashboardpage /&gt;} /&gt;} /&gt;
+            &lt;Route path="product" element={&lt;ProtectedRoute element={&lt;Productpage /&gt;} /&gt;} /&gt;
+            &lt;Route path="order" element={&lt;ProtectedRoute element={&lt;Orderpage /&gt;} /&gt;} /&gt;
+            &lt;Route path="sales" element={&lt;ProtectedRoute element={&lt;Salespage /&gt;} /&gt;} /&gt;
+            &lt;Route path="stock-transaction" element={&lt;ProtectedRoute element={&lt;StockTransaction /&gt;} /&gt;} /&gt;
+            &lt;Route path="category" element={&lt;ProtectedRoute element={&lt;Categorypage /&gt;} /&gt;} /&gt;
+            &lt;Route path="supplier" element={&lt;ProtectedRoute element={&lt;Supplierpage /&gt;} /&gt;} /&gt;
+            &lt;Route path="activity-log" element={&lt;ProtectedRoute element={&lt;Activitylogpage /&gt;} /&gt;} /&gt;
+          &lt;/Route&gt;
+
+          &lt;Route path="/AdminDashboard" element={&lt;ProtectedRoute element={&lt;AdminDashboard /&gt;} /&gt;}&gt;
+            &lt;Route path="product" element={&lt;ProtectedRoute element={&lt;Productpage /&gt;} /&gt;} /&gt;
+            &lt;Route path="order" element={&lt;ProtectedRoute element={&lt;Orderpage /&gt;} /&gt;} /&gt;
+            &lt;Route path="notifications" element={&lt;ProtectedRoute element={&lt;Notificationpage /&gt;} /&gt;} /&gt;
+            &lt;Route path="supplier" element={&lt;ProtectedRoute element={&lt;Supplierpage /&gt;} /&gt;} /&gt;
+            &lt;Route path="activity-log" element={&lt;ProtectedRoute element={&lt;Activitylogpage /&gt;} /&gt;} /&gt;
+          &lt;/Route&gt;
+
+          &lt;Route path="/StaffDashboard" element={&lt;ProtectedRoute element={&lt;StaffDashboard /&gt;} /&gt;}&gt;
+            &lt;Route path="product" element={&lt;ProtectedRoute element={&lt;Productpage /&gt;} /&gt;} /&gt;
+            &lt;Route path="order" element={&lt;ProtectedRoute element={&lt;Orderpage /&gt;} /&gt;} /&gt;
+            &lt;Route path="sales" element={&lt;ProtectedRoute element={&lt;Salespage /&gt;} /&gt;} /&gt;
+          &lt;/Route&gt;
+        &lt;/Routes&gt;
+      &lt;/div&gt;
+    &lt;/Router&gt;
+  );
+}
+
+export default App;</pre>
+      </div>
+
+      <div class="code-section">
+        <div class="code-header">
+          <span class="code-filename">server/models/Appointment.js — Appointment Schema</span>
+          <button class="copy-btn" onclick="copyCode(this)">⎘ Copy</button>
+        </div>
+        <pre>const mongoose = require("mongoose");
+
+const appointmentSchema = new mongoose.Schema({
+  name: String,
+  email: String,
+  date: String,
+  time: String,
+  status: {
+    type: String,
+    default: "Booked"
+  }
+});
+
+module.exports = mongoose.model("Appointment", appointmentSchema);</pre>
+      </div>
+
+      <div class="code-section">
+        <div class="code-header">
+          <span class="code-filename">server/server.js — Appointment Server</span>
+          <button class="copy-btn" onclick="copyCode(this)">⎘ Copy</button>
+        </div>
+        <pre>const express = require("express");
+const mongoose = require("mongoose");
+const bodyParser = require("body-parser");
+const app = express();
+
+app.use(bodyParser.json());
+
+mongoose.connect("mongodb://127.0.0.1:27017/appointmentsDB")
+  .then(() => console.log("MongoDB Connected"))
+  .catch(err => console.log(err));
+
+const Appointment = require("./models/Appointment");
+
+app.post("/appointments", async (req, res) => {
+  const appt = new Appointment(req.body);
+  await appt.save();
+  res.send(appt);
+});
+
+app.get("/appointments", async (req, res) => {
+  const data = await Appointment.find();
+  res.send(data);
+});
+
+app.put("/appointments/:id", async (req, res) => {
+  const updated = await Appointment.findByIdAndUpdate(
+    req.params.id,
+    req.body,
+    { new: true }
+  );
+  res.send(updated);
+});
+
+app.delete("/appointments/:id", async (req, res) => {
+  await Appointment.findByIdAndDelete(req.params.id);
+  res.send("Appointment Cancelled");
+});
+
+app.listen(3000, () => console.log("Server running on port 3000"));</pre>
+      </div>
+    </div>
+
+    <!-- EXP 8 -->
+    <div class="experiment" id="exp8" data-exp="8" data-tags="event management registration eventify conditional rendering spa">
+      <div class="exp-header">
+        <span class="exp-num-badge">EXP 08</span>
+        <div>
+          <h2>Event Management System</h2>
+          <p>Event listing, detail view, user registrations with conditional rendering (SPA)</p>
+        </div>
+      </div>
+
+      <div class="code-section">
+        <div class="code-header">
+          <span class="code-filename">server/app.js — Backend Server Configuration</span>
+          <button class="copy-btn" onclick="copyCode(this)">⎘ Copy</button>
+        </div>
+        <pre>import cors from "cors";
+import express from "express";
+import eventRoutes from "./routes/eventRoutes.js";
+import registrationRoutes from "./routes/registrationRoutes.js";
+
+const app = express();
+app.use(cors());
+app.use(express.json());
+app.use("/api/events", eventRoutes);
+app.use("/api/registrations", registrationRoutes);
+
+export default app;</pre>
+      </div>
+
+      <div class="code-section">
+        <div class="code-header">
+          <span class="code-filename">models/Event.js — MongoDB Schema for Events &amp; Registrations</span>
+          <button class="copy-btn" onclick="copyCode(this)">⎘ Copy</button>
+        </div>
+        <pre>import mongoose from "mongoose";
+
+const eventSchema = new mongoose.Schema({
+  title: { type: String, required: true },
+  description: { type: String, required: true },
+  date: { type: String, required: true },
+  location: { type: String, required: true },
+  category: { type: String, required: true },
+  poster: { type: String },
+  agenda: [{ type: String }],
+  createdAt: { type: Date, default: Date.now }
+});
+
+export const Event = mongoose.model("Event", eventSchema);</pre>
+      </div>
+
+      <div class="code-section">
+        <div class="code-header">
+          <span class="code-filename">services/eventService.js — Event Data Service</span>
+          <button class="copy-btn" onclick="copyCode(this)">⎘ Copy</button>
+        </div>
+        <pre>import { Event } from "../models/Event.js";
+
+export const fetchAllEvents = async () => {
+  const events = await Event.find().sort({ date: 1 });
+  return events.map(event => ({
+    id: event._id,
+    title: event.title,
+    description: event.description,
+    meta: {
+      date: event.date,
+      location: event.location,
+      category: event.category
+    },
+    visuals: {
+      poster: event.poster
+    },
+    details: {
+      agenda: event.agenda
+    }
+  }));
+};</pre>
+      </div>
+
+      <div class="code-section">
+        <div class="code-header">
+          <span class="code-filename">controllers/eventController.js — Event Controller</span>
+          <button class="copy-btn" onclick="copyCode(this)">⎘ Copy</button>
+        </div>
+        <pre>import { fetchAllEvents } from "../services/eventService.js";
+
+export const getEvents = async (req, res) => {
+  try {
+    const eventData = await fetchAllEvents();
+    if (!eventData) {
+      return res.status(404).json({ message: "No events found." });
+    }
+    res.json(eventData);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};</pre>
+      </div>
+
+      <div class="code-section">
+        <div class="code-header">
+          <span class="code-filename">models/Registration.js — Registration Schema &amp; Controller</span>
+          <button class="copy-btn" onclick="copyCode(this)">⎘ Copy</button>
+        </div>
+        <pre>import mongoose from "mongoose";
+
+const registrationSchema = new mongoose.Schema({
+  eventId: { type: mongoose.Schema.Types.ObjectId, ref: 'Event' },
+  userName: { type: String, required: true },
+  userEmail: { type: String, required: true },
+  registeredAt: { type: Date, default: Date.now }
+});
+
+const Registration = mongoose.model("Registration", registrationSchema);
+
+export const getRegistrations = async (_req, res) => {
+  const history = await Registration.find()
+    .populate('eventId', 'title')
+    .sort({ registeredAt: -1 });
+  res.json(history);
+};</pre>
+      </div>
+
+      <div class="code-section">
+        <div class="code-header">
+          <span class="code-filename">client/src/App.jsx — React Frontend Main Logic</span>
+          <button class="copy-btn" onclick="copyCode(this)">⎘ Copy</button>
+        </div>
+        <pre>import { useEffect, useState } from "react";
+import { fetchEvents, fetchRegistrations } from "./services/api";
+
+const App = () => {
+  const [events, setEvents] = useState([]);
+  const [selectedEvent, setSelectedEvent] = useState(null);
+  const [registrations, setRegistrations] = useState([]);
+  const [error, setError] = useState("");
+
+  const loadData = async () => {
+    try {
+      const eventData = await fetchEvents();
+      const regData = await fetchRegistrations();
+      setEvents(eventData);
+      setRegistrations(regData);
+    } catch (err) {
+      setError("Failed to load platform data.");
+    }
+  };
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const handleSelectEvent = (event) => {
+    setSelectedEvent(event);
+  };
+
+  return (
+    &lt;div&gt;
+      &lt;h1&gt;Event Management System&lt;/h1&gt;
+      {/* selectedEvent ? &lt;DetailsView /&gt; : &lt;GridView /&gt; */}
+    &lt;/div&gt;
+  );
+};
+
+export default App;</pre>
+      </div>
+
+      <div class="code-section">
+        <div class="code-header">
+          <span class="code-filename">client/src/services/api.js — Frontend API Calls</span>
+          <button class="copy-btn" onclick="copyCode(this)">⎘ Copy</button>
+        </div>
+        <pre>const API_BASE_URL = "http://localhost:5000/api";
+
+export const fetchEvents = async () => {
+  const response = await fetch(`${API_BASE_URL}/events`);
+  return response.json();
+};
+
+export const fetchRegistrations = async () => {
+  const response = await fetch(`${API_BASE_URL}/registrations`);
+  return response.json();
+};
+
+export const submitRegistration = async (regData) => {
+  const response = await fetch(`${API_BASE_URL}/registrations`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(regData)
+  });
+  return response.json();
+};</pre>
+      </div>
+
+      <div class="code-section">
+        <div class="code-header">
+          <span class="code-filename">.env — Environment File</span>
+          <button class="copy-btn" onclick="copyCode(this)">⎘ Copy</button>
+        </div>
+        <pre>PORT=5000
+MONGODB_URI=mongodb://127.0.0.1:27017/eventDB
+CLIENT_URL=http://localhost:5173
+NODE_ENV=development</pre>
+      </div>
+    </div>
+
+    <div class="no-results" id="noResults" style="display:none;">
+      <div class="big">⌕</div>
+      <div>No experiments match your search</div>
+    </div>
+
+  </div><!-- /content -->
+</main>
+
+<script>
+const searchInput = document.getElementById('searchInput');
+const tabs = document.querySelectorAll('.tab');
+const experiments = document.querySelectorAll('.experiment');
+const navItems = document.querySelectorAll('.exp-nav-item');
+const resultCount = document.getElementById('resultCount');
+const noResults = document.getElementById('noResults');
+
+let activeFilter = 'all';
+
+function applyFilters() {
+  const q = searchInput.value.toLowerCase().trim();
+  let visible = 0;
+
+  experiments.forEach(exp => {
+    const expNum = exp.dataset.exp;
+    const tags = exp.dataset.tags || '';
+    const text = exp.innerText.toLowerCase();
+
+    const matchesFilter = activeFilter === 'all' || expNum === activeFilter;
+    const matchesSearch = !q || text.includes(q) || tags.includes(q);
+
+    if (matchesFilter && matchesSearch) {
+      exp.classList.remove('hidden');
+      visible++;
+    } else {
+      exp.classList.add('hidden');
+    }
+  });
+
+  noResults.style.display = visible === 0 ? 'block' : 'none';
+  resultCount.textContent = `Showing ${visible} experiment${visible !== 1 ? 's' : ''}`;
+}
+
+searchInput.addEventListener('input', applyFilters);
+
+tabs.forEach(tab => {
+  tab.addEventListener('click', () => {
+    tabs.forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    activeFilter = tab.dataset.filter;
+    applyFilters();
+  });
+});
+
+navItems.forEach(item => {
+  item.addEventListener('click', () => {
+    navItems.forEach(n => n.classList.remove('active'));
+    item.classList.add('active');
+    const target = document.getElementById(item.dataset.target);
+    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+});
+
+function copyCode(btn) {
+  const pre = btn.closest('.code-section').querySelector('pre');
+  const text = pre.innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '✓ Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = '⎘ Copy';
+      btn.classList.remove('copied');
+    }, 2000);
+  });
+}
+
+// Highlight active nav on scroll
+const content = document.getElementById('content');
+content.addEventListener('scroll', () => {
+  experiments.forEach(exp => {
+    if (exp.classList.contains('hidden')) return;
+    const rect = exp.getBoundingClientRect();
+    if (rect.top >= 0 && rect.top < 300) {
+      navItems.forEach(n => n.classList.remove('active'));
+      const match = document.querySelector(`[data-target="${exp.id}"]`);
+      if (match) match.classList.add('active');
+    }
+  });
+});
+</script>
+</body>
+</html>
